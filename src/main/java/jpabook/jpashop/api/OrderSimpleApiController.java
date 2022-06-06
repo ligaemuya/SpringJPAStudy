@@ -27,6 +27,7 @@ public class OrderSimpleApiController {
         for (Order order : all) {
             order.getMember().getName(); // Lazy 강제 초기화됨
             order.getDelivery().getAddress(); // Lazy 강제 초기화됨
+            
         }
         return all;
     }
