@@ -1,5 +1,6 @@
-package jpabook.jpashop.service;
+package jpabook.jpashop.service.query;
 
+import jpabook.jpashop.api.OrderApiController;
 import jpabook.jpashop.domain.Delivery;
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.domain.Order;
@@ -15,60 +16,29 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class OrderService {
+public
+class OrderQueryService {
 
     private final OrderRepository orderRepository;
+    public List<jpabook.jpashop.service.query.OrderDto> ordersV3() {
+        List<Order> orders = orderRepository.findAllWithItem();
 
-    private final MemberRepository memberRepository;
+        for (Order order : orders) {
+            System.out.println("order ref = " + order + " id=" + order.getId());
+        }
 
-    private final ItemRepository itemRepository;
-
-    /**
-     * 주문
-     * @return
-     */
-    @Transactional
-    public Long order(Long memberId, Long itemId, int count) {
-
-        //엔티티 조회
-        Member member = memberRepository.findOne(memberId);
-        Item item = itemRepository.findOne(itemId);
-
-        //배송정보 생성
-        Delivery delivery = new Delivery();
-        delivery.setAddress(member.getAddress());
-
-        //주문상품 생성
-        OrderItem orderItem = OrderItem.createOrderItem(item, item.getPrice(), count);
-
-        //주문 생성
-        Order order = Order.createOrder(member, delivery, orderItem);
-
-        //주문 저장
-        orderRepository.save(order);
-
-        return order.getId();
-    }
-
-    /**
-     *  주문 취소
-     */
-    @Transactional
-    public void cancelOrder(Long orderId) {
-        //주문 엔티티 조회
-        Order order = orderRepository.findOne(orderId);
-        //주문 취소
-        order.cancel();
+        List<OrderDto> result = orders.stream()
+                .map(OrderDto::new)
+                .collect(toList());
+        return result;
     }
 
 
-    // 검색
-    public List<Order> findOrders(OrderSearch orderSearch) {
-        return orderRepository.findAllByString(orderSearch);
-    }
 }
 
 
