@@ -35,10 +35,12 @@ public class OrderService {
 
         //엔티티 조회
         Member member = memberRepository.findById(memberId).get();
+
         Item item = itemRepository.findOne(itemId);
 
         //배송정보 생성
         Delivery delivery = new Delivery();
+        
         delivery.setAddress(member.getAddress());
 
         //주문상품 생성
